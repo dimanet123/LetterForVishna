@@ -29,7 +29,8 @@ MainTable = openpyxl.load_workbook("ListOfMarks.xlsx")
 tableCheck = pnd.read_excel('ListOfStudents.xlsx', sheet_name="Worksheet")
 tableCheck = tableCheck[tableCheck['Целевое обучение']=="Да - ЦДП"]
 
-for sheetName in MainTable.sheetnames:
+def outputOfGroup(sheetName):
+    width = 40
     timetableMain = pnd.read_excel('ListOfMarks.xlsx', sheet_name=sheetName)
     timetableMain = timetableMain[timetableMain['ФИО'].isin(tableCheck['Полное ФИО'])]
     sheet = table.create_sheet(sheetName)
@@ -41,6 +42,11 @@ for sheetName in MainTable.sheetnames:
         sheet.append(row)
     for i in range (15):
         sheet.cell(row = 1, column = 4+i).alignment = aligment_day
+    sheet.column_dimensions['B'].width = width
+    sheet.column_dimensions['C'].width = 20
+
+for sheetName in MainTable.sheetnames:
+    outputOfGroup(sheetName)
 table.save('Оценки.xlsx')
     
 
