@@ -28,16 +28,22 @@ table = openpyxl.Workbook()
 MainTable = openpyxl.load_workbook("ListOfMarks.xlsx")
 tableCheck = pnd.read_excel('ListOfStudents.xlsx', sheet_name="Worksheet")
 tableCheck = tableCheck[tableCheck['Целевое обучение']=="Да - ЦДП"]
+table_academ = tableCheck[tableCheck['Состояние обучения']=="В академическом отпуске"]
 
 def outputOfGroup(sheetName):
     width = 40
     timetableMain = pnd.read_excel('ListOfMarks.xlsx', sheet_name=sheetName)
-    timetableMain = timetableMain[timetableMain['ФИО'].isin(tableCheck['Полное ФИО'])]
+    timetableMain = timetableMain[timetableMain['ФИО'].isin(tableCheck['ФИО'])]
     sheet = table.create_sheet(sheetName)
     empty_column = pnd.Series([np.nan] * len(timetableMain), name='ФИО')
     timetableMain = timetableMain.drop('№', axis=1)
     timetableMain.insert(0, 'Группа',empty_column)
     timetableMain['Группа'] = sheetName
+    def add_4_if_exists(name):
+        if name in table_academ['ФИО'].values:
+            return f"{name} а.о."
+        return name
+    timetableMain['ФИО'] = timetableMain['ФИО'].apply(lambda x: add_4_if_exists(x))
     for row in dataframe_to_rows(timetableMain, index=False, header=True):
         sheet.append(row)
     for i in range (15):
